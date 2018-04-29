@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-print("Hello python");
+print("Hello python")
