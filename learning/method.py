@@ -29,7 +29,9 @@ r = move(100, 100, 60, math.pi / 6)
 print(r[0])
 
 
+# Oneline doc string
 def quadratic(a, b, c):
+    
     if (not isinstance(a, int)) or (not isinstance(b, int))\
          or (not isinstance(c, int)):
         raise TypeError('Please input int type')
@@ -40,3 +42,32 @@ def quadratic(a, b, c):
 
 result = quadratic(1, -4, 1)
 print(result)
+
+
+def add_end(L=None):
+    if L is None:
+        L = []
+    L.append('END')
+    return L
+
+
+print(add_end(['Start']))
+
+
+def cal(*numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+
+
+print(cal(1, 2, 3))
+
+
+def person(name, age, **kw):
+    print('name:', name, 'age:', age, 'other:', kw)
+
+
+person('Michael', 20, city='Beijing')
+extra = {'city': 'Beijing', 'job': 'Engineer'}
+person('Tom', 34, **extra)
