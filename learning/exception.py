@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import logging
+logging.basicConfig(level=logging.INFO)
 
 try:
     print('try...')
-    r = 10 / int('a')
+    r = 10 / int('2')
     print('result:', r)
 except ValueError as e:
     print('ValueError:', e)
@@ -20,8 +21,15 @@ print('END')
 print("=========================")
 
 
+class FooError(ValueError):
+    pass
+
+
 def foo(s):
-    return 10 / int(s)
+    n = int(s)
+    if n == 0:
+        raise FooError('invalid value: %s' % s)
+    return 10 / n
 
 
 def bar(s):
@@ -30,10 +38,13 @@ def bar(s):
 
 def main():
     try:
-        bar('0')
+        bar('5')
     except Exception as e:
         logging.exception(e)
 
 
 main()
 print('END')
+
+
+logging.info('--------last info')
