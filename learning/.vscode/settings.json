@@ -1,7 +1,9 @@
 {
+    "python.pythonPath": "python3",
     "python.linting.pylintEnabled": false,
     "python.unitTest.pyTestArgs": [
         "."
     ],
-    "python.unitTest.pyTestEnabled": true
+    "python.unitTest.pyTestEnabled": true,
+    "python.linting.flake8Enabled": true
 }
