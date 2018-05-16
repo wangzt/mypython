@@ -5,5 +5,15 @@
         "."
     ],
     "python.unitTest.pyTestEnabled": true,
-    "python.linting.flake8Enabled": true
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "yapf",
+    "files.defaultLanguage": "python",
+    // By default, create file  username
+  "fileheader.Author": "tomsky.wang",
+
+  // By default, update file  username.
+  "fileheader.LastModifiedBy": "",
+
+  // By default, common template. Do not modify it!!!!!
+  "fileheader.tpl": "#!/usr/bin/env python3\r\n# -*- coding: utf-8 -*-\r\n\r\n# @Author: {author} \r\n# @Date: {createTime}\r\n\r\n"
 }
