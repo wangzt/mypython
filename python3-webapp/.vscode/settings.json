@@ -6,5 +6,6 @@
 	],
 	"settings": {
 		"files.defaultLanguage": "python"
-	}
+	},
+	"python.linting.pylintEnabled": false
 }
