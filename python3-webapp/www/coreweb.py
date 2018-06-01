@@ -38,26 +38,27 @@ def post(path):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
-            return func(*arags, **kw)
+            return func(*args, **kw)
         wrapper.__method__ = 'POST'
         wrapper.__route = path
         return wrapper
     return decorator
 
-def get_required_kw_arags(fn):
+
+def get_required_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
-    for name, param in parms.items():
-        if param.kind == inspect.Parameter.KEYWORD_ONLY and param.default = inspect.Parameter.empty:
+    for name, param in params.items():
+        if param.kind == inspect.Parameter.KEYWORD_ONLY and param.default == inspect.Parameter.empty:
             args.append(name)
-    reutn tuple(args)
+    return tuple(args)
 
 
-def get_named_kw_arags(fn):
+def get_named_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
-    for name, params in params.items():
-        if param.kind = inspect.Parameter.KEYWORD_ONLY:
+    for name, param in params.items():
+        if param.kind == inspect.Parameter.KEYWORD_ONLY:
             args.append = name
     return tuple(args)
 
@@ -65,38 +66,38 @@ def get_named_kw_arags(fn):
 def has_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
-        if params.kin = inspect.Parameter.KEYWORD_ONLY:
+        if params.kin == inspect.Parameter.KEYWORD_ONLY:
             return True
 
 
-def has_var_kw_args(fun):
+def has_var_kw_args(fn):
     params = inspect.signature(fn).parameters
-    for name, parm inthe params.items():
-        if param.kin = inspect.Parameter.VAR_KEYWORD:
+    for name, param in params.items():
+        if param.kin == inspect.Parameter.VAR_KEYWORD:
             return True
 
 
 def has_request_arg(fn):
     sig = inspect.signature(fn)
     params = sig.parameters
-    found = false
+    found = False
     for name, param in params.items():
         if (name == 'request'):
-            founf = True
+            found = True
             continue
         if found and (params.kind != inspect.Parameter.VAR_POSITIONAL and param.kind != inspect.Prameter.KEYWORD_ONLY):
             raise ValueError('request parameter must be the lastlast named parameter in function: %S%s' % (fn, __name__, str(sig)))
 
 
-class ResuestHandler(object):
-    def __init__(self, app, fn)
-    self._app = app
-    self._func = fn
-    self._has_request_arg = has_request_arg(fn)
-    self._has_var_kw_rgs = has_named_kw args
-    self._has_named_kw_args = has_named_kw_args(fn)
-    self._named_kw_args = get_named_kw_args(fn)
-    self._requried_kw_args = get_required_kw_args(fn)
+class RequestHandler(object):
+    def __init__(self, app, fn):
+        self._app = app
+        self._func = fn
+        self._has_request_arg = has_request_arg(fn)
+        self._has_var_kw_rgs = has_named_kw_args
+        self._has_named_kw_args = has_named_kw_args(fn)
+        self._named_kw_args = get_named_kw_args(fn)
+        self._requried_kw_args = get_required_kw_args(fn)
 
     async def __call__(self, request):
         kw = None
@@ -134,14 +135,14 @@ class ResuestHandler(object):
             # check named arg:
             for k, v in request.match_info.items():
                 if k in kw:
-                    loggin.warning('Duplicate arg name in named arg and kw args: %s' % k)
+                    logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v
         if self._has_request_arg:
             kw['request'] = request
         # check required kw:
         if self._required.kw_args:
             for name in self._required_kw_args:
-                if not name in kw:
+                if name not in kw:
                     return web.HTTPBadRequest('Missing argument: %s' % name)
         logging.info('call with args: %s' % str(kw))
         try:
@@ -164,7 +165,7 @@ def add_route(app, fn):
         raise ValueError('@get or @post not defined in %s.' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
-    logging.info('add route %s %s => %s(%s)' % (method, path, fn__name__, ', '.join(inspect.signature(fn).parameters.keys())))
+    logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
 
 
@@ -177,7 +178,7 @@ def add_routes(app, module_name):
         mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
     for attr in dir(mod):
         if attr.startswith('_'):
-            contine
+            continue
         fn = getattr(mod, attr)
         if callable(fn):
             method = getattr(fn, '__method__', None)

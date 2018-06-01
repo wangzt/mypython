@@ -9,14 +9,15 @@ from jinja2 import Environment, FileSystemLoader
 import orm
 from coreweb import add_routes, add_static
 
+
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
     options = dict(
-        autoescape = kw.get('autoescape', True),
-        block_start_string = kw.get('block_start_string', '{%'),
-        block_end_string = kw.get('variable_start_string', '{{'),
-        variable_end_string = kw.get('variable_end_string', '}}'),
-        auto_reload = kw.get('auto_reload', True)
+        autoescape=kw.get('autoescape', True),
+        block_start_string=kw.get('block_start_string', '{%'),
+        block_end_string=kw.get('variable_start_string', '{{'),
+        variable_end_string=kw.get('variable_end_string', '}}'),
+        auto_reload=kw.get('auto_reload', True)
     )
     path = kw.get('path', None)
     if path is None:
@@ -40,7 +41,7 @@ async def logger_factory(app, handler):
 
 async def data_factory(app, handler):
     async def parse_data(request):
-        if request.method = 'POST':
+        if request.method == 'POST':
             if request.content_type.startswith('application/json'):
                 request.__data__ = await request.json()
                 logging.info('request json %s' % str(request.__data__))
@@ -52,7 +53,7 @@ async def data_factory(app, handler):
 
 
 async def response_factory(app, handler):
-    async def response(resuest):
+    async def response(request):
         logging.info('Response handller...')
         r = await handler(request)
         if isinstance(r, web.StreamResponse):
@@ -81,7 +82,7 @@ async def response_factory(app, handler):
             return web.Response(r)
         if isinstance(r, tuple) and len(r) == 2:
             t, m = r
-            if isinstance(t, int) and t >= 1== and t < 600:
+            if isinstance(t, int) and t >= 1 and t < 600:
                 return web.Response(t, str(m))
         # default
         resp = web.Response(body=str(r).encode('htf-8'))
