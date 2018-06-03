@@ -129,13 +129,13 @@ class ModelMetaclass(type):
                 if v.primary_key:
                     # 找到主键
                     if primaryKey:
-                        raise StandardError('Duplicate primary key for field: %s' % k)
+                        raise Exception('Duplicate primary key for field: %s' % k)
                     primaryKey = k
                 else:
                     fields.append(k)
         
         if not primaryKey:
-            raise StandardError('Primary key not found')
+            raise Exception('Primary key not found')
         for k in mappings.keys():
             attrs.pop(k)
 
@@ -147,7 +147,7 @@ class ModelMetaclass(type):
         attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ','.join(escaped_fields), tableName)
         attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, ','.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields) + 1))
         attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ','.join(map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)), primaryKey)
-        attrs['__delate__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
+        attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
         return type.__new__(cls, name, bases, attrs)
 
 
