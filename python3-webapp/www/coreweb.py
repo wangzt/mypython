@@ -66,14 +66,14 @@ def get_named_kw_args(fn):
 def has_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
-        if params.kin == inspect.Parameter.KEYWORD_ONLY:
+        if param.kind == inspect.Parameter.KEYWORD_ONLY:
             return True
 
 
-def has_var_kw_args(fn):
+def has_var_kw_arg(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
-        if param.kin == inspect.Parameter.VAR_KEYWORD:
+        if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
 
 
@@ -94,10 +94,10 @@ class RequestHandler(object):
         self._app = app
         self._func = fn
         self._has_request_arg = has_request_arg(fn)
-        self._has_var_kw_rgs = has_named_kw_args
+        self._has_var_kw_arg = has_var_kw_arg(fn)
         self._has_named_kw_args = has_named_kw_args(fn)
         self._named_kw_args = get_named_kw_args(fn)
-        self._requried_kw_args = get_required_kw_args(fn)
+        self._required_kw_args = get_required_kw_args(fn)
 
     async def __call__(self, request):
         kw = None
@@ -140,13 +140,13 @@ class RequestHandler(object):
         if self._has_request_arg:
             kw['request'] = request
         # check required kw:
-        if self._required.kw_args:
+        if self._required_kw_args:
             for name in self._required_kw_args:
                 if name not in kw:
                     return web.HTTPBadRequest('Missing argument: %s' % name)
         logging.info('call with args: %s' % str(kw))
         try:
-            r = await self._func(**kw)
+            r = await self._func(self, **kw)
             return r
         except APIError as e:
             return dict(error=e.error, data=e.data, message=e.message)
@@ -185,61 +185,3 @@ def add_routes(app, module_name):
             path = getattr(fn, '__route__', None)
             if method and path:
                 add_route(app, fn)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
