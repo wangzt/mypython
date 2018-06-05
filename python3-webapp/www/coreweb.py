@@ -59,7 +59,7 @@ def get_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
-            args.append = name
+            args.append(name)
     return tuple(args)
 
 
@@ -146,7 +146,7 @@ class RequestHandler(object):
                     return web.HTTPBadRequest('Missing argument: %s' % name)
         logging.info('call with args: %s' % str(kw))
         try:
-            r = await self._func(self, **kw)
+            r = await self._func(**kw)
             return r
         except APIError as e:
             return dict(error=e.error, data=e.data, message=e.message)
