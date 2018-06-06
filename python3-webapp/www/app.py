@@ -122,6 +122,10 @@ def datetime_filter(t):
 # loop.run_forever()
 
 
+async def on_close(app):
+    await orm.destroy_pool()
+
+
 async def init(loop):
     await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='root', password='root', db='py_test')
     app = web.Application(loop=loop, middlewares=[
@@ -130,11 +134,32 @@ async def init(loop):
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 9000)
+    app.on_shutdown.append(on_close)
+
+    # srv = await loop.create_server(app.make_handler(), '127.0.0.1', 9000)
+    handler = app.make_handler()
+    srv = await loop.create_server(handler, '127.0.0.1', 9000)
+    
+    rs = dict()
+    rs['app'] = app
+    rs['srv'] = srv
+    rs['handler'] = handler
+
     logging.info('server started ad http://127.0.0.1:9000...')
-    return srv
+    return rs
 
 
 loop = asyncio.get_event_loop()
-loop.run_until_complete(init(loop))
-loop.run_forever()
+rs = loop.run_until_complete(init(loop))
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+finally:
+    rs['srv'].close()
+    loop.run_until_complete(rs['srv'].wait_closed())
+    loop.run_until_complete(rs['app'].shutdown())
+    loop.run_until_complete(rs['handler'].shutdown())
+    loop.run_until_complete(rs['app'].cleanup())
+loop.close()
+    
